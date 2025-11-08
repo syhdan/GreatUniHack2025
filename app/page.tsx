@@ -3,20 +3,13 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
-import { useTheme } from "@/contexts/theme-context"
 import { Button } from "@/components/ui/button"
-import { Compass, Users, MapPin, Moon, Sun } from "lucide-react"
-import { useState, useEffect } from "react"
+import { Compass, Users, MapPin } from "lucide-react"
+import { AppHeader } from "@/components/app-header"
 
 export default function Home() {
   const { user } = useAuth()
-  const { theme, toggleTheme } = useTheme()
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const handleBecomeGuide = () => {
     if (!user) {
@@ -28,45 +21,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Compass className="h-6 w-6 text-blue-500" />
-            <span className="text-xl font-bold">TourGuide</span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            {mounted && (
-              <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </Button>
-            )}
-            {user ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground">Welcome, {user.name}</span>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    localStorage.removeItem("user")
-                    window.location.reload()
-                  }}
-                >
-                  Log out
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="outline">Log in</Button>
-                </Link>
-                <Link href="/signup">
-                  <Button className="bg-blue-500 hover:bg-blue-600 text-white">Sign up</Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="container mx-auto px-4">
         <div className="text-center py-16">

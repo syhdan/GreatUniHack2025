@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Navbar } from "@/components/navbar"
+import { AppHeader } from "@/components/app-header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,6 +30,7 @@ export default function ApplyPage() {
   const [specialty, setSpecialty] = useState("")
   const [experience, setExperience] = useState("")
   const [rate, setRate] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -37,17 +38,48 @@ export default function ApplyPage() {
     }
   }, [user, isLoading])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle application submission
-    alert("Application submitted successfully!")
-    router.push("/")
+
+    if (!user) return
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch("/api/guides", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.name,
+          email: user.email,
+          location,
+          languages,
+          specialty,
+          experience,
+          rate,
+        }),
+      })
+
+      if (response.ok) {
+        alert("Application submitted successfully! Your profile has been added to our tour guides.")
+        router.push("/guides")
+      } else {
+        alert("Failed to submit application. Please try again.")
+      }
+    } catch (error) {
+      console.error("Error submitting application:", error)
+      alert("An error occurred. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
+        <AppHeader />
         <div className="container mx-auto px-4 py-12 flex items-center justify-center">
           <p>Loading...</p>
         </div>
@@ -57,7 +89,7 @@ export default function ApplyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <AppHeader />
 
       <div className="container mx-auto px-4 py-12">
         <Card className="max-w-2xl mx-auto">
@@ -100,7 +132,7 @@ export default function ApplyPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="specialty">Specialty</Label>
+                  <Label htmlFor="specialty">Specialty (comma separated)</Label>
                   <Input
                     id="specialty"
                     placeholder="e.g., Art & History, Cultural Experience"
@@ -134,8 +166,8 @@ export default function ApplyPage() {
                   />
                 </div>
 
-                <Button type="submit" className="w-full">
-                  Submit Application
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
                 </Button>
               </CardContent>
             </form>

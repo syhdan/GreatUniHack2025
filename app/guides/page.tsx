@@ -1,71 +1,13 @@
 "use client"
-
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Search, MapPin, Star, Moon, Sun } from "lucide-react"
+import { Search, MapPin, Star } from "lucide-react"
 import Image from "next/image"
-
-const tourGuides = [
-  {
-    id: "1",
-    name: "Maria Garcia",
-    city: "Barcelona",
-    country: "Spain",
-    rating: 4.9,
-    reviews: 127,
-    price: 45,
-    image: "/woman-tour-guide.jpg",
-    specialties: ["Architecture", "Food Tours"],
-  },
-  {
-    id: "2",
-    name: "Carlos Rodriguez",
-    city: "Barcelona",
-    country: "Spain",
-    rating: 4.7,
-    reviews: 92,
-    price: 40,
-    image: "/man-tour-guide.jpg",
-    specialties: ["Beach Tours", "Nightlife"],
-  },
-  {
-    id: "3",
-    name: "Marie Laurent",
-    city: "Paris",
-    country: "France",
-    rating: 4.9,
-    reviews: 127,
-    price: 75,
-    image: "/french-tour-guide.jpg",
-    specialties: ["Art & History", "Museums"],
-  },
-  {
-    id: "4",
-    name: "James Wilson",
-    city: "London",
-    country: "UK",
-    rating: 4.8,
-    reviews: 98,
-    price: 65,
-    image: "/british-tour-guide.jpg",
-    specialties: ["Historical Tours", "Royal Palaces"],
-  },
-  {
-    id: "5",
-    name: "Yuki Tanaka",
-    city: "Tokyo",
-    country: "Japan",
-    rating: 5.0,
-    reviews: 156,
-    price: 80,
-    image: "/asian-tour-guide.jpg",
-    specialties: ["Cultural Experience", "Temples"],
-  },
-]
+import type { TourGuide } from "@/lib/types"
+import { AppHeader } from "@/components/app-header"
 
 export default function GuidesPage() {
   const { user } = useAuth()
@@ -74,18 +16,43 @@ export default function GuidesPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [searchPerformed, setSearchPerformed] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [guides, setGuides] = useState<TourGuide[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  useEffect(() => {
+    fetchGuides()
+  }, [])
+
+  const fetchGuides = async (city?: string) => {
+    setIsLoading(true)
+    try {
+      const url = city ? `/api/guides?city=${encodeURIComponent(city)}` : "/api/guides"
+      const response = await fetch(url)
+      const data = await response.json()
+      setGuides(data)
+    } catch (error) {
+      console.error("Error fetching guides:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const filteredGuides =
     searchPerformed && searchQuery
-      ? tourGuides.filter((guide) => guide.city.toLowerCase().includes(searchQuery.toLowerCase()))
-      : tourGuides.slice(0, 3) // Show top 3 popular guides by default
+      ? guides.filter((guide) => guide.city.toLowerCase().includes(searchQuery.toLowerCase()))
+      : guides.slice(0, 3) // Show top 3 popular guides by default
 
   const handleSearch = () => {
     setSearchPerformed(true)
+    if (searchQuery) {
+      fetchGuides(searchQuery)
+    } else {
+      fetchGuides()
+    }
   }
 
   const handleViewProfile = (guideId: string) => {
@@ -96,22 +63,7 @@ export default function GuidesPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:text-muted-foreground w-fit">
-            <ArrowLeft className="h-5 w-5" />
-            <span className="font-medium">Back to Home</span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            {mounted && (
-              <Button variant="ghost" size="icon" onClick={toggleTheme}>
-                {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-              </Button>
-            )}
-          </div>
-        </div>
-      </header>
+      <AppHeader />
 
       <main className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
@@ -147,56 +99,62 @@ export default function GuidesPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
-          {filteredGuides.map((guide) => (
-            <div key={guide.id} className="bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border">
-              <div className="flex gap-4">
-                <div className="relative h-20 w-20 rounded-full overflow-hidden flex-shrink-0">
-                  <Image src={guide.image || "/placeholder.svg"} alt={guide.name} fill className="object-cover" />
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold mb-1">{guide.name}</h3>
-                  <div className="flex items-center gap-1 text-muted-foreground mb-2">
-                    <MapPin className="h-4 w-4" />
-                    <span>{guide.city}</span>
-                  </div>
-                  <div className="flex items-center gap-1 mb-3">
-                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    <span className="font-semibold">{guide.rating}</span>
-                    <span className="text-muted-foreground text-sm">({guide.reviews} reviews)</span>
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading guides...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl">
+            {filteredGuides.map((guide) => (
+              <div key={guide.id} className="bg-card rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border">
+                <div className="flex gap-4">
+                  <div className="relative h-20 w-20 rounded-full overflow-hidden flex-shrink-0">
+                    <Image src={guide.image || "/placeholder.svg"} alt={guide.name} fill className="object-cover" />
                   </div>
 
-                  <div className="flex items-center gap-2 mb-4 flex-wrap">
-                    {guide.specialties.map((specialty) => (
-                      <span
-                        key={specialty}
-                        className="bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-medium"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold text-blue-500">${guide.price}</span>
-                      <span className="text-muted-foreground">/hour</span>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-1">{guide.name}</h3>
+                    <div className="flex items-center gap-1 text-muted-foreground mb-2">
+                      <MapPin className="h-4 w-4" />
+                      <span>{guide.city}</span>
                     </div>
-                    <Button
-                      onClick={() => handleViewProfile(guide.id)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
-                    >
-                      View Profile
-                    </Button>
+                    <div className="flex items-center gap-1 mb-3">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-semibold">{guide.rating}</span>
+                      <span className="text-muted-foreground text-sm">({guide.reviews} reviews)</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 mb-4 flex-wrap">
+                      {guide.specialties.map((specialty) => (
+                        <span
+                          key={specialty}
+                          className="bg-yellow-100 dark:bg-yellow-950 text-yellow-800 dark:text-yellow-200 px-3 py-1 rounded-full text-sm font-medium"
+                        >
+                          {specialty}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-2xl font-bold text-blue-500">${guide.price}</span>
+                        <span className="text-muted-foreground">/hour</span>
+                      </div>
+                      <Button
+                        onClick={() => handleViewProfile(guide.id)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg"
+                      >
+                        View Profile
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
-        {searchPerformed && filteredGuides.length === 0 && (
+        {!isLoading && searchPerformed && filteredGuides.length === 0 && (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">No tour guides found in {searchQuery}. Try another city!</p>
           </div>

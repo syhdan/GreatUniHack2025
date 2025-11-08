@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useAuth } from "@/contexts/auth-context"
-import { Navbar } from "@/components/navbar"
+import { AppHeader } from "@/components/app-header"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <AppHeader />
 
       <div className="container mx-auto px-4 py-12 flex items-center justify-center">
         <Card className="w-full max-w-md">

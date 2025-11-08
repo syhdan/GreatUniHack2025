@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, Moon, Sun } from "lucide-react"
+import { User, Moon, Sun, Compass } from "lucide-react"
 import { useTheme } from "@/contexts/theme-context"
 import { useEffect, useState } from "react"
 
@@ -24,10 +24,11 @@ export function Navbar() {
   }, [])
 
   return (
-    <nav className="border-b bg-background">
+    <nav className="border-b bg-card">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold">
-          TourGuide
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Compass className="h-6 w-6 text-blue-500" />
+          <span className="text-xl font-bold">CrossWorlds</span>
         </Link>
 
         <div className="flex items-center gap-4">
