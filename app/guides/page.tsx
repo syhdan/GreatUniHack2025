@@ -8,7 +8,7 @@ import { Search, MapPin, Star } from "lucide-react"
 import Image from "next/image"
 import type { TourGuide } from "@/lib/types"
 import { AppHeader } from "@/components/app-header"
-import { GoogleGenAI } from "@google/genai";
+import { Chatbot } from "@/components/chatbot"
 
 export default function GuidesPage() {
   const { user } = useAuth()
@@ -19,12 +19,6 @@ export default function GuidesPage() {
   const [mounted, setMounted] = useState(false)
   const [guides, setGuides] = useState<TourGuide[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [chatQuery, setChatQuery] = useState("");
-  const [chatResponse, setChatResponse] = useState("");
-  const [isChatLoading, setIsChatLoading] = useState(false);
-  const ai = new GoogleGenAI({
-    apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY, // Use the API key from the environment variable
-  });
 
   useEffect(() => {
     setMounted(true)
@@ -65,36 +59,6 @@ export default function GuidesPage() {
   const handleViewProfile = (guideId: string) => {
     router.push(`/guides/${guideId}`)
   }
-
-  const handleChatQuery = async () => {
-    if (!chatQuery) {
-      setChatResponse("Please enter a question.");
-      return;
-    }
-
-    setIsChatLoading(true);
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: `You are a helpful AI assistant specializing in holidays and trip planning. The user is asking about what they can expect to see or do during their trip. Provide your answer in concise bullet points.\n\nUser: ${chatQuery}\nAI:`,
-      });
-
-      // Remove asterisks (*) and format the response into a list
-      const sanitizedResponse = response.text
-        ?.replace(/\*/g, "") // Remove asterisks
-        .split("\n") // Split into lines
-        .filter((line) => line.trim() !== "") // Remove empty lines
-        .map((line) => `• ${line.trim()}`) // Add bullet points
-        .join("\n"); // Join back into a single string
-
-      setChatResponse(sanitizedResponse || "Sorry, I couldn't find any relevant information.");
-    } catch (error) {
-      console.error("Error fetching chat response:", error);
-      setChatResponse("Failed to fetch response. Please try again.");
-    } finally {
-      setIsChatLoading(false);
-    }
-  };
 
   const displayCity = searchPerformed && searchQuery ? searchQuery : "Popular Destinations"
 
@@ -196,36 +160,8 @@ export default function GuidesPage() {
             <p className="text-muted-foreground text-lg">No tour guides found in {searchQuery}. Try another city!</p>
           </div>
         )}
-
-        <div className="mt-12">
-          <h2 className="text-3xl font-bold mb-4">Ask the Chatbot</h2>
-          <p className="text-muted-foreground text-lg mb-6">
-            Ask about what you can expect to see in places.
-          </p>
-          <div className="flex gap-3 max-w-4xl mx-auto">
-            <input
-              type="text"
-              placeholder="Ask your question..."
-              value={chatQuery}
-              onChange={(e) => setChatQuery(e.target.value)}
-              className="flex-1 pl-4 pr-4 py-4 text-lg border-2 border-blue-200 dark:border-blue-800 rounded-lg focus:outline-none focus:border-blue-400 dark:focus:border-blue-600 bg-background"
-            />
-            <Button
-              onClick={handleChatQuery}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 text-lg h-auto rounded-lg"
-              disabled={isChatLoading}
-            >
-              {isChatLoading ? "Loading..." : "Ask"}
-            </Button>
-          </div>
-          {chatResponse && (
-            <div className="mt-6 bg-card p-4 rounded-lg shadow-md">
-              <h3 className="text-xl font-bold mb-2">Chatbot Response:</h3>
-              <p>{chatResponse}</p>
-            </div>
-          )}
-        </div>
       </main>
+      <Chatbot />
     </div>
   )
 }
