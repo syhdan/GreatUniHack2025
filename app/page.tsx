@@ -45,10 +45,6 @@ export default function Home() {
       opacity: 1,
       transition: {
         duration: 0.5,
-        // FIX: Added 'as const' here.
-        // This tells TypeScript to treat this as a read-only tuple
-        // [number, number, number, number] instead of a generic number[],
-        // which satisfies Framer Motion's Easing type.
         ease: [0.25, 1, 0.5, 1] as const,
       },
     },
@@ -100,12 +96,12 @@ export default function Home() {
               variants={itemVariants}
             >
               <Link href="/guides">
-                <Button size="lg" className="btn btn-primary w-full sm:w-auto text-lg py-8 px-10">
+                <Button size="lg" className="btn btn-primary w-64 text-lg py-8 px-10">
                   Find a Guide
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
-              <Button size="lg" variant="secondary" onClick={handleBecomeGuide} className="btn btn-secondary w-full sm:w-auto text-lg py-8 px-10">
+              <Button size="lg" variant="secondary" onClick={handleBecomeGuide} className="btn btn-secondary w-64 text-lg py-8 px-10">
                 Become a Guide
               </Button>
             </MotionDiv>
