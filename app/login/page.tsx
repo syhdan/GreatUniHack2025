@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { AppHeader } from "@/components/app-header"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { MotionDiv } from "@/components/motion"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -42,62 +43,70 @@ export default function LoginPage() {
       <AppHeader />
 
       <main className="flex-1 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome Back</CardTitle>
-            <CardDescription>Sign in to continue your journey with CrossWorlds</CardDescription>
-          </CardHeader>
+        <MotionDiv
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="w-full max-w-md shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl">Welcome Back</CardTitle>
+              <CardDescription>Sign in to continue your journey with CrossWorlds</CardDescription>
+            </CardHeader>
 
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-6">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
+              </CardContent>
 
-            <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
-              </Button>
+              <CardFooter className="flex flex-col gap-4">
+                <Button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
 
-              <p className="text-sm text-center text-muted-foreground">
-                Don't have an account?{" "}
-                <Link href="/signup" className="font-medium text-primary hover:underline">
-                  Sign up
-                </Link>
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
+                <p className="text-sm text-center text-muted-foreground">
+                  Don't have an account?{" "}
+                  <Link href="/signup" className="font-semibold text-primary hover:underline">
+                    Sign up
+                  </Link>
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
+        </MotionDiv>
       </main>
     </div>
   )

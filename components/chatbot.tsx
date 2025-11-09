@@ -66,7 +66,7 @@ export function Chatbot() {
     <div className="fixed bottom-4 right-4 z-50">
       <PanelGroup direction="horizontal">
         <Panel defaultSize={100} minSize={30}>
-          <div className="w-[400px] h-[500px] bg-card border rounded-lg shadow-lg flex flex-col">
+          <div className="w-[400px] h-[500px] bg-card border rounded-lg shadow-lg flex flex-col" style={{ backgroundColor: 'var(--card)' }}>
             <div className="p-4 border-b flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Bot className="h-6 w-6 text-primary" />

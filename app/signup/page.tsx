@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { AppHeader } from "@/components/app-header"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { MotionDiv } from "@/components/motion"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -55,88 +56,98 @@ export default function SignupPage() {
       <AppHeader />
 
       <main className="flex-1 flex items-center justify-center py-12">
-        <Card className="w-full max-w-md shadow-xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create an Account</CardTitle>
-            <CardDescription>Join CrossWorlds to book tours and become a guide</CardDescription>
-          </CardHeader>
+        <MotionDiv
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Card className="w-full max-w-md shadow-2xl">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl">Create an Account</CardTitle>
+              <CardDescription>Join CrossWorlds to book tours and become a guide</CardDescription>
+            </CardHeader>
 
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-6">
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
 
-              <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="h-12"
+                  />
+                </div>
+              </CardContent>
 
-            <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </Button>
+              <CardFooter className="flex flex-col gap-4">
+                <Button type="submit" className="btn btn-primary w-full" disabled={isLoading}>
+                  {isLoading ? "Creating Account..." : "Create Account"}
+                </Button>
 
-              <p className="text-sm text-center text-muted-foreground">
-                Already have an account?{" "}
-                <Link href="/login" className="font-medium text-primary hover:underline">
-                  Log in
-                </Link>
-              </p>
-            </CardFooter>
-          </form>
-        </Card>
+                <p className="text-sm text-center text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link href="/login" className="font-semibold text-primary hover:underline">
+                    Log in
+                  </Link>
+                </p>
+              </CardFooter>
+            </form>
+          </Card>
+        </MotionDiv>
       </main>
     </div>
   )

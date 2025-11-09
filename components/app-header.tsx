@@ -16,6 +16,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Compass, Moon, Sun, ArrowLeft, LogOut, User as UserIcon } from "lucide-react"
 import { useState, useEffect } from "react"
+import Image from "next/image"
 
 export function AppHeader() {
   const { user } = useAuth()
@@ -37,7 +38,7 @@ export function AppHeader() {
   const showBackButton = pathname !== "/"
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 w-full border-b" style={{ backgroundColor: 'var(--background)' }}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           {showBackButton && (
@@ -74,7 +75,7 @@ export function AppHeader() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 bg-card" align="end" forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">{user.name}</p>
