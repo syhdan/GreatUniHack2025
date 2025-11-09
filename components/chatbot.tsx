@@ -85,13 +85,18 @@ export function Chatbot() {
                   >
                     {chat.role === "ai" && <Bot className="h-6 w-6 text-primary flex-shrink-0" />}
                     <div
-                      className={`p-3 rounded-lg max-w-[80%] ${
+                      className={`relative p-3 rounded-lg max-w-[80%] shadow-md ${
                         chat.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-primary text-primary-foreground rounded-br-none"
+                          : "bg-muted rounded-bl-none"
                       }`}
                     >
                       <p className="whitespace-pre-wrap text-sm">{chat.content}</p>
+                      {chat.role === "user" ? (
+                        <div className="absolute right-0 bottom-0 w-0 h-0 border-8 border-transparent border-b-primary border-r-primary translate-x-full translate-y-full" />
+                      ) : (
+                        <div className="absolute left-0 bottom-0 w-0 h-0 border-8 border-transparent border-b-muted border-l-muted -translate-x-full translate-y-full" />
+                      )}
                     </div>
                   </div>
                 ))}
