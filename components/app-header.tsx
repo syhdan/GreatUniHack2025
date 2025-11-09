@@ -5,7 +5,16 @@ import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { useTheme } from "@/contexts/theme-context"
 import { Button } from "@/components/ui/button"
-import { Compass, Moon, Sun, ArrowLeft } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Compass, Moon, Sun, ArrowLeft, LogOut, User as UserIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 
 export function AppHeader() {
@@ -28,22 +37,21 @@ export function AppHeader() {
   const showBackButton = pathname !== "/"
 
   return (
-    <header className="border-b bg-card">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/80 backdrop-blur-sm">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-2">
           {showBackButton && (
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
               aria-label="Go back"
-              className="hover:bg-muted"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Compass className="h-6 w-6 text-blue-500" />
+          <Link href="/" className="flex items-center gap-2 text-primary hover:opacity-80 transition-opacity">
+            <Compass className="h-6 w-6" />
             <span className="text-xl font-bold">CrossWorlds</span>
           </Link>
         </div>
@@ -57,21 +65,44 @@ export function AppHeader() {
           {!isAuthPage && (
             <>
               {user ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-muted-foreground">Welcome, {user.name}</span>
-                  <Button variant="outline" onClick={handleLogout}>
-                    Log out
-                  </Button>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.photo || "/placeholder-user.jpg"} alt={user.name} />
+                        <AvatarFallback>{user.name?.[0]}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => router.push('/apply')}>
+                      <UserIcon className="mr-2 h-4 w-4" />
+                      <span>Become a guide</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               ) : (
-                <>
+                <div className="flex items-center gap-2">
                   <Link href="/login">
-                    <Button variant="outline">Log in</Button>
+                    <Button variant="ghost">Log in</Button>
                   </Link>
                   <Link href="/signup">
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white">Sign up</Button>
+                    <Button>Sign up</Button>
                   </Link>
-                </>
+                </div>
               )}
             </>
           )}

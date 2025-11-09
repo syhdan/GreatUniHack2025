@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -12,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuth } from "@/contexts/auth-context"
 import { AppHeader } from "@/components/app-header"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export default function SignupPage() {
   const [name, setName] = useState("")
@@ -28,12 +28,12 @@ export default function SignupPage() {
     setError("")
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
+      setError("Passwords do not match.")
       return
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters")
+      setError("Password must be at least 6 characters long.")
       return
     }
 
@@ -44,27 +44,28 @@ export default function SignupPage() {
     if (success) {
       router.push("/")
     } else {
-      setError("Email already exists")
+      setError("An account with this email already exists.")
     }
 
     setIsLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col">
       <AppHeader />
 
-      <div className="container mx-auto px-4 py-12 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Sign up</CardTitle>
-            <CardDescription>Create an account to book tours and become a guide</CardDescription>
+      <main className="flex-1 flex items-center justify-center py-12">
+        <Card className="w-full max-w-md shadow-xl">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Create an Account</CardTitle>
+            <CardDescription>Join CrossWorlds to book tours and become a guide</CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               {error && (
                 <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
@@ -78,6 +79,7 @@ export default function SignupPage() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -86,10 +88,11 @@ export default function SignupPage() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="you@example.com"
+                  placeholder="m@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -98,9 +101,11 @@ export default function SignupPage() {
                 <Input
                   id="password"
                   type="password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -109,28 +114,30 @@ export default function SignupPage() {
                 <Input
                   id="confirmPassword"
                   type="password"
+                  placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </CardContent>
 
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating account..." : "Sign up"}
+                {isLoading ? "Creating Account..." : "Create Account"}
               </Button>
 
               <p className="text-sm text-center text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/login" className="text-primary hover:underline">
+                <Link href="/login" className="font-medium text-primary hover:underline">
                   Log in
                 </Link>
               </p>
             </CardFooter>
           </form>
         </Card>
-      </div>
+      </main>
     </div>
   )
 }

@@ -3,22 +3,26 @@
 import { useParams, useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
-import { MapPin, Star, User, Calendar } from "lucide-react"
+import { MapPin, Star, User, Calendar, Languages, ArrowRight } from "lucide-react"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import type { TourGuide } from "@/lib/types"
 import { AppHeader } from "@/components/app-header"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
 
 export default function GuideProfilePage() {
   const params = useParams()
   const router = useRouter()
   const { user } = useAuth()
-  const [guideId] = useState(params.id as string)
+  const guideId = params.id as string
   const [guide, setGuide] = useState<TourGuide | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetchGuide = async () => {
+      if (!guideId) return
+      setIsLoading(true)
       try {
         const response = await fetch(`/api/guides/${guideId}`)
         if (response.ok) {
@@ -26,9 +30,11 @@ export default function GuideProfilePage() {
           setGuide(data)
         } else {
           console.error("Failed to fetch guide")
+          setGuide(null)
         }
       } catch (error) {
         console.error("Error fetching guide:", error)
+        setGuide(null)
       } finally {
         setIsLoading(false)
       }
@@ -36,22 +42,6 @@ export default function GuideProfilePage() {
 
     fetchGuide()
   }, [guideId])
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading guide profile...</p>
-      </div>
-    )
-  }
-
-  if (!guide) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">Guide not found</p>
-      </div>
-    )
-  }
 
   const handleBookNow = () => {
     if (!user) {
@@ -61,117 +51,141 @@ export default function GuideProfilePage() {
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <div className="container mx-auto px-4 py-12 max-w-4xl">
+          <div className="flex flex-col md:flex-row gap-8 mb-8">
+            <Skeleton className="h-40 w-40 rounded-full" />
+            <div className="flex-1 space-y-4">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-6 w-3/4" />
+              <div className="flex gap-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-8">
+            <Skeleton className="h-8 w-1/4" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-8 w-1/4" />
+            <div className="flex gap-2">
+              <Skeleton className="h-8 w-24" />
+              <Skeleton className="h-8 w-24" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!guide) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <div className="container mx-auto px-4 py-12 text-center">
+          <h2 className="text-2xl font-bold">Guide not found</h2>
+          <p className="text-muted-foreground mt-2">
+            The guide you are looking for does not exist.
+          </p>
+          <Button onClick={() => router.push("/guides")} className="mt-6">
+            Back to Guides
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
 
-      {/* Profile Content */}
-      <div className="container mx-auto px-6 py-8 max-w-4xl">
-        {/* Profile Header */}
-        <div className="flex gap-6 mb-8">
+      <main className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className="flex flex-col md:flex-row gap-8 mb-8">
           <div className="relative h-40 w-40 rounded-full overflow-hidden flex-shrink-0">
-            <Image src={guide.image || "/placeholder.svg"} alt={guide.name} fill className="object-cover" />
+            <Image src={guide.image || "/placeholder-user.jpg"} alt={guide.name} fill className="object-cover" />
           </div>
-
           <div className="flex-1">
-            <h2 className="text-4xl font-bold mb-3">{guide.name}</h2>
+            <h1 className="text-4xl font-bold mb-2">{guide.name}</h1>
             <div className="flex items-center gap-2 text-muted-foreground mb-3">
               <MapPin className="h-5 w-5" />
-              <span className="text-lg">{guide.city}</span>
+              <span className="text-lg">{guide.city}, {guide.country}</span>
             </div>
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex items-center gap-4 mb-4">
               <div className="flex items-center gap-1">
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                <Star className="h-5 w-5 fill-accent text-accent" />
                 <span className="font-bold text-lg">{guide.rating}</span>
                 <span className="text-muted-foreground">({guide.reviews} reviews)</span>
               </div>
               {guide.yearsExperience > 0 && (
-                <>
-                  <span className="text-muted-foreground">•</span>
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="text-muted-foreground">{guide.yearsExperience} years experience</span>
-                  </div>
-                </>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <User className="h-5 w-5" />
+                  <span>{guide.yearsExperience} years of experience</span>
+                </div>
               )}
             </div>
             <div className="flex items-center gap-2 flex-wrap">
               {guide.specialties.map((specialty) => (
-                <span
-                  key={specialty}
-                  className="bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  {specialty}
-                </span>
+                <Badge key={specialty}>{specialty}</Badge>
               ))}
             </div>
           </div>
         </div>
 
-        {/* About Me */}
-        <section className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">About Me</h3>
-          <p className="text-muted-foreground leading-relaxed text-lg">{guide.bio}</p>
-        </section>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="md:col-span-2 space-y-8">
+            <section>
+              <h2 className="text-2xl font-bold mb-4">About Me</h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {guide.bio || "No biography provided."}
+              </p>
+            </section>
 
-        {/* Languages */}
-        <section className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">Languages</h3>
-          <div className="flex items-center gap-3 flex-wrap">
-            {guide.languages.map((language) => (
-              <span
-                key={language}
-                className="bg-yellow-300 dark:bg-yellow-600 text-black dark:text-black px-5 py-2 rounded-full text-base font-medium"
-              >
-                {language}
-              </span>
-            ))}
+            <section>
+              <h2 className="text-2xl font-bold mb-4">Languages</h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                {guide.languages.map((language) => (
+                  <Badge key={language} variant="secondary">{language}</Badge>
+                ))}
+              </div>
+            </section>
+
+            {guide.tours?.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold mb-4">Tours Offered</h2>
+                <ul className="space-y-2 text-muted-foreground">
+                  {guide.tours.map((tour) => (
+                    <li key={tour} className="flex items-center gap-2">
+                      <ArrowRight className="h-4 w-4 text-primary" />
+                      <span>{tour}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
-        </section>
 
-        {/* Tours Offered */}
-        {guide.tours.length > 0 && (
-          <section className="mb-8">
-            <h3 className="text-2xl font-bold mb-4">Tours Offered</h3>
-            <div className="space-y-3">
-              {guide.tours.map((tour) => (
-                <div key={tour} className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full bg-blue-50 dark:bg-blue-950 flex items-center justify-center flex-shrink-0">
-                    <div className="h-4 w-4 rounded-full border-2 border-blue-500" />
-                  </div>
-                  <span className="text-lg">{tour}</span>
-                </div>
-              ))}
+          <aside className="space-y-6">
+            <div className="bg-card border rounded-lg p-6">
+              <h3 className="text-xl font-bold mb-4">Book a Tour</h3>
+              <div className="flex items-baseline mb-4">
+                <span className="text-3xl font-bold text-primary">${guide.price}</span>
+                <span className="text-muted-foreground">/hour</span>
+              </div>
+              <div className="flex items-center gap-2 text-muted-foreground mb-4">
+                <Calendar className="h-5 w-5" />
+                <span>{guide.availability}</span>
+              </div>
+              <Button onClick={handleBookNow} className="w-full" size="lg">
+                Book Now
+              </Button>
             </div>
-          </section>
-        )}
-
-        {/* Availability */}
-        <section className="mb-8">
-          <h3 className="text-2xl font-bold mb-4">Availability</h3>
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Calendar className="h-5 w-5" />
-            <span className="text-lg">{guide.availability}</span>
-          </div>
-        </section>
-
-        {/* Booking Section */}
-        <div className="bg-card border rounded-xl p-6 flex items-center justify-between">
-          <div>
-            <div className="mb-1">
-              <span className="text-3xl font-bold text-blue-500">${guide.price}</span>
-              <span className="text-muted-foreground text-lg">/hour</span>
-            </div>
-            <p className="text-muted-foreground">Book your authentic local experience</p>
-          </div>
-          <Button
-            onClick={handleBookNow}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-6 text-lg rounded-lg"
-          >
-            Book Now
-          </Button>
+          </aside>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

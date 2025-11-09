@@ -1,106 +1,61 @@
 "use client"
 
 import Image from "next/image"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import Link from "next/link"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Star, MapPin, Languages } from "lucide-react"
-import { useAuth } from "@/contexts/auth-context"
-import { useRouter } from "next/navigation"
-import { useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-
-interface TourGuide {
-  id: string
-  name: string
-  location: string
-  languages: string[]
-  rating: number
-  reviews: number
-  price: number
-  image: string
-  specialty: string
-}
+import { Star, MapPin, Languages, ArrowRight } from "lucide-react"
+import type { TourGuide } from "@/lib/types"
 
 export function TourGuideCard({ guide }: { guide: TourGuide }) {
-  const { user } = useAuth()
-  const router = useRouter()
-  const [showLoginDialog, setShowLoginDialog] = useState(false)
-
-  const handleBook = () => {
-    if (!user) {
-      setShowLoginDialog(true)
-    } else {
-      // Proceed with booking
-      alert(`Booking tour with ${guide.name}!`)
-    }
-  }
-
   return (
-    <>
-      <Card className="overflow-hidden hover:shadow-lg transition-shadow">
-        <div className="aspect-square relative">
-          <Image src={guide.image || "/placeholder.svg"} alt={guide.name} fill className="object-cover" />
+    <Link href={`/guides/${guide.id}`}>
+      <Card className="overflow-hidden group h-full flex flex-col">
+        <div className="aspect-video relative">
+          <Image src={guide.image || "/placeholder.svg"} alt={guide.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          <div className="absolute bottom-4 left-4">
+            <h3 className="font-bold text-xl text-white">{guide.name}</h3>
+            <div className="flex items-center text-sm text-white/80 gap-1">
+              <MapPin className="h-4 w-4" />
+              {guide.city}
+            </div>
+          </div>
+          <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-medium flex items-center gap-1">
+            <Star className="h-4 w-4 fill-accent text-accent" />
+            <span>{guide.rating}</span>
+            <span className="text-muted-foreground">({guide.reviews} reviews)</span>
+          </div>
         </div>
 
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-2">
-            <div>
-              <h3 className="font-semibold text-lg">{guide.name}</h3>
-              <div className="flex items-center text-sm text-muted-foreground gap-1">
-                <MapPin className="h-3 w-3" />
-                {guide.location}
-              </div>
+        <CardContent className="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              {guide.specialties.map((specialty) => (
+                <Badge key={specialty}>{specialty}</Badge>
+              ))}
             </div>
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="font-medium">{guide.rating}</span>
-              <span className="text-sm text-muted-foreground">({guide.reviews})</span>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <Languages className="h-4 w-4" />
+              <span>{guide.languages.join(", ")}</span>
             </div>
           </div>
 
-          <Badge variant="secondary" className="mb-3">
-            {guide.specialty}
-          </Badge>
-
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Languages className="h-4 w-4" />
-            <span>{guide.languages.join(", ")}</span>
+          <div className="flex items-center justify-between mt-4">
+            <div>
+              <span className="text-2xl font-bold text-primary">${guide.price}</span>
+              <span className="text-sm text-muted-foreground">/hour</span>
+            </div>
+            <Button asChild className="group">
+              <div>
+                Book Now
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </Button>
           </div>
         </CardContent>
-
-        <CardFooter className="p-4 pt-0 flex items-center justify-between">
-          <div>
-            <span className="text-2xl font-bold">${guide.price}</span>
-            <span className="text-sm text-muted-foreground">/hour</span>
-          </div>
-          <Button onClick={handleBook}>Book Now</Button>
-        </CardFooter>
       </Card>
-
-      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Login Required</DialogTitle>
-            <DialogDescription>
-              You need to be logged in to book a tour guide. Please log in or create an account to continue.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowLoginDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={() => router.push("/login")}>Log in</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    </Link>
   )
 }
